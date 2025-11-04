@@ -1,10 +1,10 @@
 // Create a new router
-const express = require("express");
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
 
 router.get('/register', function (req, res, next) {
-    res.render('register.ejs');                                                                     
-});        
+    res.render('register.ejs')
+})
 
 router.post('/registered', function (req, res, next) {
     // saving data in database
@@ -12,4 +12,4 @@ router.post('/registered', function (req, res, next) {
 }); 
 
 // Export the router object so index.js can access it
-module.exports = router;
+module.exports = router

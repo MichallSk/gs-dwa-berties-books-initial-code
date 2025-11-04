@@ -2,8 +2,9 @@
 
 Sample code for Dynamic Web Applications module.
 
-To run:
+Uses node.js with Express and EJS.
+
+To install and run:
 
 npm install
 node index.js
-
