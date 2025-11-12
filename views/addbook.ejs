@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bertie's Books: Add book</title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+<body>
+    <h1>Bertie's Books: Add book</h1>
+    
+    <!-- Form to add a new book to the database -->
+    <!-- method="POST" sends data securely to the server -->
+    <!-- action="/books/bookadded" specifies where to send the form data -->
+    <form method="POST" action="/books/bookadded">
+        <!-- Text input for the book name -->
+        <p>Book name: <input type="text" name="name" required /></p>
+        
+        <!-- Number input for the price (with decimal places) -->
+        <p>Price: <input type="number" step="0.01" name="price" required /></p>
+        
+        <!-- Submit button - sends the form data to the server -->
+        <input type="submit" value="Add Book" />
+    </form>
+</body>
+</html>

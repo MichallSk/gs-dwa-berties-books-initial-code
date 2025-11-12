@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berties Book Shop - Available Books</title>
+    <link rel="stylesheet" href="/main.css">
+</head>
+<body>
+    <h1>Bertie's Books Shop</h1>
+    <h2>Here are the books that we sell:</h2>
+    
+    <!-- Check if availableBooks array has any books -->
+    <% if (availableBooks && availableBooks.length > 0) { %>
+        <!-- If books exist, display them in a bulleted list -->
+        <ul>
+            <!-- Loop through each book in the availableBooks array -->
+            <% availableBooks.forEach(function(book) { %>
+                <!-- Display book name and price formatted to 2 decimal places -->
+                <li><%= book.name %>, £<%= parseFloat(book.price).toFixed(2) %></li>
+            <% }); %>
+        </ul>
+    <!-- If no books are available, show this message -->
+    <% } else { %>
+        <p>No books available at the moment.</p>
+    <% } %>
+</body>
+</html>
