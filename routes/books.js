@@ -21,10 +21,27 @@ router.get('/addbook', function(req, res, next){
 });
 
 // SEARCH RESULT - GET /search-result
-// Processes the search query from the form
-// Example: /search-result?keyword=animal
+// Processes the search query from the form and returns matching books
+// Example: /search-result?search_text=animal
 router.get('/search-result', function (req, res, next) {
-    res.send("You searched for: " + req.query.keyword)
+    // Read the search text from the form (name="search_text")
+    const term = req.query.search_text ? req.query.search_text.trim() : '';
+
+    // If no search term provided, render a friendly message
+    if (!term) {
+        return res.render('search-result.ejs', { query: term, results: [] });
+    }
+
+    // Use a parameterized LIKE query to find books whose name contains the term
+    const sql = "SELECT * FROM books WHERE name LIKE ?";
+    const params = ['%' + term + '%'];
+
+    db.query(sql, params, (err, result) => {
+        if (err) return next(err);
+
+        // Render the search-result template with the results (may be empty)
+        res.render('search-result.ejs', { query: term, results: result });
+    });
 });
 
 // LIST ALL BOOKS - GET /list

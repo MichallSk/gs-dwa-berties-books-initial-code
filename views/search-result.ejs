@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Search results - <%= shopData.shopName %></title>
+    <link rel="stylesheet"  type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <h1>Search results for "<%= query %>"</h1>
+
+    <% if (results && results.length > 0) { %>
+      <p>We found <%= results.length %> matching book(s):</p>
+      <ul>
+        <% results.forEach(function(book) { %>
+          <li><%= book.name %>, £<%= parseFloat(book.price).toFixed(2) %></li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>Sorry — we don't have a book matching "<%= query %>" in stock right now.</p>
+      <p>Try a different keyword, or browse our <a href="/books/list">full book list</a>.</p>
+    <% } %>
+
+    <p><a href="/books/search">← Back to search</a></p>
+  </body>
+</html>
