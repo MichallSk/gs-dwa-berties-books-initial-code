@@ -3,6 +3,7 @@
 // ===========================
 
 // Import required packages/libraries
+require('dotenv').config()                  // Load environment variables from .env
 var express = require ('express')           // Web framework for Node.js
 var ejs = require('ejs')                    // Template engine (generates HTML dynamically)
 const path = require('path')                // Utility for working with file paths
@@ -15,11 +16,12 @@ const port = 8000                           // Server runs on port 8000 (localho
 
 // ===== DATABASE CONFIGURATION =====
 // Set up MySQL database connection pool (multiple connections for better performance)
+// Credentials come from environment variables (see .env and README dotenv section)
 const db = mysql.createPool({
-    host: 'localhost',                      // Database server location
-    user: 'berties_books_app',              // Database user
-    password: 'qwertyuiop',                 // Database password
-    database: 'berties_books',              // Database name
+    host: process.env.BB_HOST || 'localhost',  // Database server location
+    user: process.env.BB_USER,                 // Database user
+    password: process.env.BB_PASSWORD,         // Database password
+    database: process.env.BB_DATABASE,         // Database name
     waitForConnections: true,               // Wait for connection if limit reached
     connectionLimit: 10,                    // Max simultaneous connections
     queueLimit: 0,                          // Unlimited queue for pending connections

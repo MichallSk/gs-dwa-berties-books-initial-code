@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Welcome, <%= first %>!</title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <h1>Registration successful</h1>
+
+    <p>Hello <strong><%= first %> <%= last %></strong>, you are now registered with <%= shopData.shopName %>.</p>
+    <p>We will send an email to you at <strong><%= email %></strong>.</p>
+
+    <h2>Your login details</h2>
+    <p><strong>Username:</strong> <%= username %></p>
+    <p><strong>Password:</strong> <%= password %></p>
+    <p><strong>Hashed password:</strong> <code><%= hashedPassword %></code></p>
+
+    <p><a href="/">Back to homepage</a></p>
+  </body>
+</html>

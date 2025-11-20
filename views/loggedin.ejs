@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Login result - <%= shopData.shopName %></title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <h1>Login result</h1>
+
+    <% if (success) { %>
+      <p><strong><%= message %></strong></p>
+      <p>You are logged in as <strong><%= username %></strong>.</p>
+    <% } else { %>
+      <p><strong><%= message %></strong></p>
+      <p>Please check your username and password and try again.</p>
+    <% } %>
+
+    <p><a href="/users/login">Back to login</a></p>
+    <p><a href="/">Back to homepage</a></p>
+  </body>
+</html>
