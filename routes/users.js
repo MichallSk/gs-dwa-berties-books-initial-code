@@ -60,6 +60,7 @@ router.get('/login', function (req, res, next) {
 router.post('/loggedin', function (req, res, next) {
     const username = req.body.username
     const plainPassword = req.body.password
+	const ip = req.ip || null
 
     // Look up the user by username
     const sql = "SELECT * FROM users WHERE username = ?";
@@ -69,11 +70,10 @@ router.post('/loggedin', function (req, res, next) {
 
         // If no user found, login fails
         if (!results || results.length === 0) {
-            // Record failed login attempt in audit_log
+            // Record failed login attempt in audit_log and stop
             const auditSql = "INSERT INTO audit_log (username, success, ip_address) VALUES (?,?,?)";
-            const ip = req.ip || null;
 
-            db.query(auditSql, [username, 0, ip], function (auditErr) {
+            return db.query(auditSql, [username, 0, ip], function (auditErr) {
                 if (auditErr) return next(auditErr)
 
                 return res.render('loggedin.ejs', {
@@ -91,11 +91,10 @@ router.post('/loggedin', function (req, res, next) {
             if (compareErr) return next(compareErr)
 
             if (!match) {
-                // Password does not match – record failed attempt
+                // Password does not match – record failed attempt and stop
                 const auditSql = "INSERT INTO audit_log (username, success, ip_address) VALUES (?,?,?)";
-                const ip = req.ip || null;
 
-                db.query(auditSql, [username, 0, ip], function (auditErr) {
+                return db.query(auditSql, [username, 0, ip], function (auditErr) {
                     if (auditErr) return next(auditErr)
 
                     return res.render('loggedin.ejs', {
@@ -108,12 +107,11 @@ router.post('/loggedin', function (req, res, next) {
 
             // Successful login – record success and show a message
             const auditSql = "INSERT INTO audit_log (username, success, ip_address) VALUES (?,?,?)";
-            const ip = req.ip || null;
 
-            db.query(auditSql, [username, 1, ip], function (auditErr) {
+            return db.query(auditSql, [username, 1, ip], function (auditErr) {
                 if (auditErr) return next(auditErr)
 
-                res.render('loggedin.ejs', {
+                return res.render('loggedin.ejs', {
                     success: true,
                     username,
                     message: 'Login successful. Welcome back, ' + username + '!'
