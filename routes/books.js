@@ -4,6 +4,7 @@
 
 // Import Express router
 const express = require("express")
+const { check, validationResult } = require('express-validator');
 const router = express.Router()
 
 // Middleware to redirect to login if user is not authenticated
@@ -73,12 +74,23 @@ router.get('/list', redirectLogin, function(req, res, next) {
 // ADD BOOK - POST /bookadded
 // Handles form submission to add a new book to the database
 // Data received: name (book title) and price
-router.post('/bookadded', redirectLogin, function (req, res, next) {
+router.post('/bookadded', 
+    redirectLogin,
+    [check('name').notEmpty().withMessage('Book name is required'),
+     check('name').isLength({ min: 1, max: 100 }).withMessage('Book name must be 1-100 characters'),
+     check('price').notEmpty().withMessage('Price is required'),
+     check('price').isFloat({ min: 0, max: 9999.99 }).withMessage('Price must be a valid number between 0 and 9999.99')],
+    function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.redirect('./addbook')
+    }
+    
     // SQL query with placeholders (?) for safe data insertion
     let sqlquery = "INSERT INTO books (name, price) VALUES (?,?)"
     
     // Extract book name and price from the form submission
-    let newrecord = [req.body.name, req.body.price]
+    let newrecord = [req.sanitize(req.body.name), req.body.price]
     
     // Execute the insert query
     db.query(sqlquery, newrecord, (err, result) => {

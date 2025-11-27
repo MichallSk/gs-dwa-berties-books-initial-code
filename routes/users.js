@@ -2,6 +2,7 @@
 const express = require("express")
 const bcrypt = require('bcrypt')            // Task 1: import bcrypt
 const saltRounds = 10                       // Task 1: define salt rounds
+const { check, validationResult } = require('express-validator');
 const router = express.Router()
 
 const redirectLogin = (req, res, next) => {
@@ -17,33 +18,48 @@ router.get('/register', function (req, res, next) {
     res.render('register.ejs')
 })
 
-router.post('/registered', function (req, res, next) {
-    const username = req.body.username
-    const first = req.body.first
-    const last = req.body.last
-    const email = req.body.email
-    const plainPassword = req.body.password
+router.post('/registered', 
+                 [check('email').isEmail().withMessage('Invalid email address'),
+                  check('username').isLength({ min: 5, max: 20}).withMessage('Username must be 5-20 characters'),
+                  check('username').isAlphanumeric().withMessage('Username must contain only letters and numbers'),
+                  check('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+                  check('first').notEmpty().withMessage('First name is required'),
+                  check('first').isAlpha().withMessage('First name must contain only letters'),
+                  check('last').notEmpty().withMessage('Last name is required'),
+                  check('last').isAlpha().withMessage('Last name must contain only letters')], 
+                 function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.render('./register')
+    }
+    else {
+        const username = req.sanitize(req.body.username)
+        const first = req.sanitize(req.body.first)
+        const last = req.sanitize(req.body.last)
+        const email = req.sanitize(req.body.email)
+        const plainPassword = req.body.password
 
-    bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
-        if (err) return next(err)
+        bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
+            if (err) return next(err)
 
-        const sql = "INSERT INTO users (username, first_name, last_name, email, password_hash) VALUES (?,?,?,?,?)"
-        const values = [username, first, last, email, hashedPassword]
+            const sql = "INSERT INTO users (username, first_name, last_name, email, password_hash) VALUES (?,?,?,?,?)"
+            const values = [username, first, last, email, hashedPassword]
 
-        db.query(sql, values, function(dbErr) {
-            if (dbErr) return next(dbErr)
+            db.query(sql, values, function(dbErr) {
+                if (dbErr) return next(dbErr)
 
-            // Render a nicely formatted confirmation page
-            res.render('registered.ejs', {
-                first,
-                last,
-                email,
-                username,
-                password: plainPassword,
-                hashedPassword
+                // Render a nicely formatted confirmation page
+                res.render('registered.ejs', {
+                    first,
+                    last,
+                    email,
+                    username,
+                    password: plainPassword,
+                    hashedPassword
+                })
             })
         })
-    })
+    }
 });
 
 // LIST USERS PAGE - GET /users/list
@@ -66,8 +82,16 @@ router.get('/login', function (req, res, next) {
 
 // LOGIN PROCESSING - POST /users/loggedin
 // Compares submitted username and password with values stored in the database
-router.post('/loggedin', function (req, res, next) {
-    const username = req.body.username
+router.post('/loggedin',
+    [check('username').notEmpty().withMessage('Username is required'),
+     check('password').notEmpty().withMessage('Password is required')],
+    function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.redirect('./login')
+    }
+    
+    const username = req.sanitize(req.body.username)
     const plainPassword = req.body.password
 	const ip = req.ip || null
 

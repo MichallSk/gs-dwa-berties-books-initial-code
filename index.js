@@ -9,6 +9,7 @@ var express = require ('express')           // Web framework for Node.js
 var ejs = require('ejs')                    // Template engine (generates HTML dynamically)
 const path = require('path')                // Utility for working with file paths
 var mysql = require('mysql2');              // Database driver for MySQL
+const expressSanitizer = require('express-sanitizer');
 
 // ===== SETUP =====
 // Create the Express application object
@@ -46,6 +47,9 @@ app.set('view engine', 'ejs')
 // ===== MIDDLEWARE =====
 // Enable parsing of form data (POST request bodies)
 app.use(express.urlencoded({ extended: true }))
+
+// Create an input sanitizer
+app.use(expressSanitizer());
 
 // Serve static files (CSS, JavaScript, images) from the 'public' folder
 app.use(express.static(path.join(__dirname, 'public')))

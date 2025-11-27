@@ -85,6 +85,77 @@ The application uses `express-session` to manage user sessions and restricts acc
 
 The `redirectLogin` middleware checks for `req.session.userId`; if absent, users are redirected to the login page. When a user successfully logs in via `/users/loggedin`, their username is stored in `req.session.userId` and they gain access to protected routes.
 
+## Validation
+
+The application uses `express-validator` to perform server-side validation on user input before processing or storing data in the database.
+
+**Where validation is applied:**
+
+1. **User Registration (`/users/registered`)**
+   - Email: Must be valid email format
+   - Username: 5-20 characters, alphanumeric only
+   - Password: Minimum 8 characters
+   - First name: Required, letters only
+   - Last name: Required, letters only
+   - **Reasoning**: Registration data is stored permanently in the database and used for authentication. Invalid data could cause security issues, database errors, or broken login functionality.
+
+2. **User Login (`/users/loggedin`)**
+   - Username: Required (not empty)
+   - Password: Required (not empty)
+   - **Reasoning**: Prevents empty submissions and database queries with null values. Although failed logins are logged in the audit trail, validation ensures clean data reaches the authentication logic.
+
+3. **Add Book (`/books/bookadded`)**
+   - Book name: Required, 1-100 characters
+   - Price: Required, must be a valid number between 0 and 9999.99
+   - **Reasoning**: Books are stored in the database and displayed throughout the app. Invalid prices could break display logic (e.g., `toFixed()` calls) or cause incorrect financial data. Name length limits prevent database overflow.
+
+**Where validation is NOT applied:**
+
+1. **Search (`/books/search-result`)**
+   - **Reasoning**: Search is a read-only operation that doesn't modify data. Empty or unusual search terms simply return no results. The query uses parameterized statements to prevent SQL injection, so validation beyond that is unnecessary.
+
+2. **Static/Read-Only Routes (`/books/list`, `/books/bargainbooks`, `/users/list`, `/users/audit`)**
+   - **Reasoning**: These routes only display data from the database and don't accept user input beyond authentication checks. No validation is needed.
+
+3. **Homepage and About (`/`, `/about`)**
+   - **Reasoning**: No user input is collected on these pages.
+
+**Validation Strategy**: Validation is applied to all routes that accept user input and either store it in the database or use it in critical operations (authentication, data modification). If validation fails, users are redirected back to the form to correct their input. This prevents invalid data from entering the system while maintaining a simple user experience.
+
+## Sanitization
+
+The application uses `express-sanitizer` to remove potentially malicious HTML and script tags from user input, protecting against XSS (Cross-Site Scripting) attacks.
+
+**Where sanitization is applied:**
+
+1. **User Registration (`/users/registered`)**
+   - Username: Sanitized to remove HTML/script tags
+   - First name: Sanitized to remove HTML/script tags
+   - Last name: Sanitized to remove HTML/script tags
+   - Email: Sanitized to remove HTML/script tags
+   - **Reasoning**: These fields are stored in the database and displayed on pages like `/users/list` and audit logs. Without sanitization, malicious users could inject script tags (e.g., `<script>alert('XSS')</script>`) that would execute when other users view these pages, compromising security.
+
+2. **User Login (`/users/loggedin`)**
+   - Username: Sanitized to remove HTML/script tags
+   - **Reasoning**: The username is displayed in success/failure messages and stored in the audit log. Sanitizing prevents any injected scripts from executing when viewing login results or audit history.
+
+3. **Add Book (`/books/bookadded`)**
+   - Book name: Sanitized to remove HTML/script tags
+   - **Reasoning**: Book names are displayed on multiple pages (`/books/list`, `/books/bargainbooks`, search results). If a malicious user adds a book with `<script>` tags in the name, those scripts would execute for anyone viewing the book list, creating an XSS vulnerability.
+
+**Where sanitization is NOT applied:**
+
+1. **Passwords (Registration and Login)**
+   - **Reasoning**: Passwords are hashed with bcrypt before storage and are never displayed to users. Sanitizing passwords could alter their value and break authentication. Since passwords are hashed and not rendered in HTML, they don't pose an XSS risk. Additionally, users should be free to use any characters in their passwords for stronger security.
+
+2. **Price fields (`/books/bookadded`)**
+   - **Reasoning**: Prices are numeric values validated by `express-validator` to ensure they're valid floats. HTML/script tags cannot be valid numbers, so validation already prevents malicious input. The price field is also not a typical vector for XSS attacks since it's restricted to numeric format.
+
+3. **Search queries (`/books/search-result`)**
+   - **Reasoning**: Search terms are only used in parameterized SQL queries and displayed back to the user who submitted them. They are not stored in the database or shown to other users, so the XSS risk is minimal. Parameterized queries already prevent SQL injection.
+
+**Sanitization Strategy**: Sanitization is applied to all text fields that are (1) stored in the database AND (2) displayed to users on rendered pages. This prevents stored XSS attacks where malicious content could affect other users. Fields that are hashed, numeric-only, or only shown to the submitter are not sanitized to preserve functionality and user choice.
+
 ## Run the application
 
 Start the app in the foreground for development:
