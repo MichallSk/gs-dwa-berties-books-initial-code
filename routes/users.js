@@ -4,6 +4,15 @@ const bcrypt = require('bcrypt')            // Task 1: import bcrypt
 const saltRounds = 10                       // Task 1: define salt rounds
 const router = express.Router()
 
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId ) {
+      res.redirect('./login') // redirect to the login page
+    } else { 
+        next (); // move to the next middleware function
+    } 
+}
+
+
 router.get('/register', function (req, res, next) {
     res.render('register.ejs')
 })
@@ -39,7 +48,7 @@ router.post('/registered', function (req, res, next) {
 
 // LIST USERS PAGE - GET /users/list
 // Shows a list of registered users (without passwords)
-router.get('/list', function (req, res, next) {
+router.get('/list', redirectLogin, function (req, res, next) {
     const sql = "SELECT id, username, first_name, last_name, email FROM users";
 
     db.query(sql, function (err, result) {
@@ -106,6 +115,9 @@ router.post('/loggedin', function (req, res, next) {
             }
 
             // Successful login – record success and show a message
+            // Save user session here, when login is successful
+            req.session.userId = req.body.username;
+            
             const auditSql = "INSERT INTO audit_log (username, success, ip_address) VALUES (?,?,?)";
 
             return db.query(auditSql, [username, 1, ip], function (auditErr) {
@@ -123,13 +135,24 @@ router.post('/loggedin', function (req, res, next) {
 
 // AUDIT LOG PAGE - GET /users/audit
 // Shows the full audit history of login attempts
-router.get('/audit', function (req, res, next) {
+router.get('/audit', redirectLogin, function (req, res, next) {
     const sql = "SELECT username, success, ip_address, created_at FROM audit_log ORDER BY created_at DESC";
 
     db.query(sql, function (err, result) {
         if (err) return next(err)
 
         res.render('audit.ejs', { auditEntries: result })
+    })
+})
+
+// LOGOUT - GET /users/logout
+// Destroys the user session and logs them out
+router.get('/logout', redirectLogin, (req,res) => {
+    req.session.destroy(err => {
+    if (err) {
+      return res.redirect('./')
+    }
+    res.send('you are now logged out. <a href='+'./'+'>Home</a>');
     })
 })
 

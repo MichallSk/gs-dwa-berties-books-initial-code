@@ -4,6 +4,7 @@
 
 // Import required packages/libraries
 require('dotenv').config()                  // Load environment variables from .env
+var session = require('express-session')  // Session management for Express
 var express = require ('express')           // Web framework for Node.js
 var ejs = require('ejs')                    // Template engine (generates HTML dynamically)
 const path = require('path')                // Utility for working with file paths
@@ -13,6 +14,16 @@ var mysql = require('mysql2');              // Database driver for MySQL
 // Create the Express application object
 const app = express()
 const port = 8000                           // Server runs on port 8000 (localhost:8000)
+
+// Create a session
+app.use(session({
+    secret: 'somerandomstuff',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        expires: 600000
+    }
+}))
 
 // ===== DATABASE CONFIGURATION =====
 // Set up MySQL database connection pool (multiple connections for better performance)

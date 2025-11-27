@@ -6,6 +6,15 @@
 const express = require("express")
 const router = express.Router()
 
+// Middleware to redirect to login if user is not authenticated
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId ) {
+      res.redirect('../users/login') // redirect to the login page
+    } else { 
+        next (); // move to the next middleware function
+    } 
+}
+
 // ===== ROUTES =====
 
 // SEARCH PAGE - GET /search
@@ -16,7 +25,7 @@ router.get('/search',function(req, res, next){
 
 // ADD BOOK PAGE - GET /addbook
 // Displays the form to add a new book to the database
-router.get('/addbook', function(req, res, next){
+router.get('/addbook', redirectLogin, function(req, res, next){
     res.render("addbook.ejs")
 });
 
@@ -46,7 +55,7 @@ router.get('/search-result', function (req, res, next) {
 
 // LIST ALL BOOKS - GET /list
 // Fetches all books from the database and displays them in a list
-router.get('/list', function(req, res, next) {
+router.get('/list', redirectLogin, function(req, res, next) {
     // SQL query to get all books from the database
     let sqlquery = "SELECT * FROM books";
     
@@ -64,7 +73,7 @@ router.get('/list', function(req, res, next) {
 // ADD BOOK - POST /bookadded
 // Handles form submission to add a new book to the database
 // Data received: name (book title) and price
-router.post('/bookadded', function (req, res, next) {
+router.post('/bookadded', redirectLogin, function (req, res, next) {
     // SQL query with placeholders (?) for safe data insertion
     let sqlquery = "INSERT INTO books (name, price) VALUES (?,?)"
     
@@ -86,7 +95,7 @@ router.post('/bookadded', function (req, res, next) {
 
 // BARGAIN BOOKS - GET /bargainbooks
 // Fetches all books priced under £20 and displays them
-router.get('/bargainbooks', function(req, res, next) {
+router.get('/bargainbooks', redirectLogin, function(req, res, next) {
     // SQL query to get books priced under £20
     let sqlquery = "SELECT * FROM books WHERE price < 20";
     

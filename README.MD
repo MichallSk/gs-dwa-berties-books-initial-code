@@ -60,6 +60,31 @@ The application records an audit trail of login attempts so that successful and 
 - The IP address of the client (`req.ip`) is stored when available.
 - The `/users/audit` route queries `audit_log` ordered by timestamp and renders the `audit.ejs` view, which displays the full audit history in a simple table.
 
+## Access Control
+
+The application uses `express-session` to manage user sessions and restricts access to certain pages:
+
+**Protected routes (login required):**
+- `/users/list` — view registered users
+- `/users/audit` — view login audit history
+- `/users/logout` — logout (must be logged in to logout)
+- `/books/list` — view all books
+- `/books/addbook` — form to add a new book
+- `/books/bookadded` — submit a new book
+- `/books/bargainbooks` — view bargain books
+
+**Public routes (no login required):**
+- `/` — homepage
+- `/about` — about page
+- `/users/register` — registration form
+- `/users/registered` — registration confirmation
+- `/users/login` — login form
+- `/users/loggedin` — login processing
+- `/books/search` — search form
+- `/books/search-result` — search results
+
+The `redirectLogin` middleware checks for `req.session.userId`; if absent, users are redirected to the login page. When a user successfully logs in via `/users/loggedin`, their username is stored in `req.session.userId` and they gain access to protected routes.
+
 ## Run the application
 
 Start the app in the foreground for development:
