@@ -71,6 +71,10 @@ app.use('/users', usersRoutes)
 const booksRoutes = require('./routes/books')
 app.use('/books', booksRoutes)
 
+// Load and register routes for weather page (routes/weather.js)
+const weatherRoutes = require('./routes/weather')
+app.use('/weather', weatherRoutes)
+
 // ===== START SERVER =====
 // Start the web server and listen on the specified port
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

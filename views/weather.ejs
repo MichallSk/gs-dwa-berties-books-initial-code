@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Weather - <%= shopData.shopName %></title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <div class="weather-container">
+      <h1>Check the weather</h1>
+      <p class="weather-intro">Search any city to see the latest conditions courtesy of OpenWeatherMap.</p>
+
+      <form class="weather-form" method="get" action="/weather">
+        <label for="city">City</label>
+        <input id="city" name="city" type="text" value="<%= query %>" placeholder="e.g. London" />
+        <button type="submit">Show weather</button>
+      </form>
+
+      <% if (error) { %>
+        <div class="weather-error"><%= error %></div>
+      <% } %>
+
+      <% if (weather) { %>
+        <section class="weather-card">
+          <h2><%= weather.city %></h2>
+          <p class="weather-description"><%= weather.description %></p>
+          <ul class="weather-details">
+            <% if (weather.temperature !== null) { %>
+              <li><span>Temperature:</span> <%= weather.temperature.toFixed(1) %>&#8451;</li>
+            <% } %>
+            <% if (weather.feelsLike !== null) { %>
+              <li><span>Feels like:</span> <%= weather.feelsLike.toFixed(1) %>&#8451;</li>
+            <% } %>
+            <% if (weather.humidity !== null) { %>
+              <li><span>Humidity:</span> <%= weather.humidity %>%</li>
+            <% } %>
+            <% if (weather.windSpeed !== null) { %>
+              <li><span>Wind speed:</span> <%= weather.windSpeed %> m/s</li>
+            <% } %>
+            <% if (weather.windDirection !== null) { %>
+              <li><span>Wind direction:</span> <%= weather.windDirection %>&#176;</li>
+            <% } %>
+            <% if (weather.cloudCover !== null) { %>
+              <li><span>Cloud cover:</span> <%= weather.cloudCover %>%</li>
+            <% } %>
+          </ul>
+        </section>
+      <% } %>
+
+      <p class="weather-back"><a href="/">Back to homepage</a></p>
+    </div>
+  </body>
+</html>

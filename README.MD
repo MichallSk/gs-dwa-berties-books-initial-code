@@ -7,6 +7,7 @@ An educational sample web application for the Dynamic Web Applications module. T
 - Add a new book (form)
 - Filter bargain books
 - Simple search page
+- Interactive weather lookup (OpenWeatherMap)
 
 ## Prerequisites
 - Node.js (v14+ recommended)
@@ -34,9 +35,6 @@ app.set('views', path.join(__dirname, 'views'))
 
 To avoid committing database credentials to the repository, the project uses the `dotenv` module:
 
-- Sensitive values are stored in a local `.env` file (which is ignored by Git).
-- `index.js` calls `require('dotenv').config()` so the variables become available as `process.env.BB_HOST`, `process.env.BB_USER`, `process.env.BB_PASSWORD`, and `process.env.BB_DATABASE`.
-- The MySQL pool reads its configuration from these environment variables instead of hard-coded strings.
 
 Example `.env` file used in development (matching the lecturer's marking setup):
 
@@ -45,9 +43,12 @@ BB_USER=berties_books_app
 BB_PASSWORD=qwertyuiop
 BB_DATABASE=berties_books
 BB_HOST=localhost
+OWM_API_KEY=your_openweathermap_api_key_here
 ```
 
 `.env` is **not** pushed to GitHub; on the lecturer's machine these variables will be set with the same names and values before running the app.
+
+## Weather route
 
 ## Audit
 
@@ -82,6 +83,7 @@ The application uses `express-session` to manage user sessions and restricts acc
 - `/users/loggedin` — login processing
 - `/books/search` — search form
 - `/books/search-result` — search results
+- `/weather` — interactive weather page (OpenWeatherMap)
 
 The `redirectLogin` middleware checks for `req.session.userId`; if absent, users are redirected to the login page. When a user successfully logs in via `/users/loggedin`, their username is stored in `req.session.userId` and they gain access to protected routes.
 
