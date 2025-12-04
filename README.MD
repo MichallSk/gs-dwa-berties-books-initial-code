@@ -8,6 +8,7 @@ An educational sample web application for the Dynamic Web Applications module. T
 - Filter bargain books
 - Simple search page
 - Interactive weather lookup (OpenWeatherMap)
+- Book catalogue JSON API (GET /api/books)
 
 ## Prerequisites
 - Node.js (v14+ recommended)
@@ -50,6 +51,19 @@ OWM_API_KEY=your_openweathermap_api_key_here
 
 ## Weather route
 
+- `/weather` renders a form that lets visitors choose a city and view current conditions returned by OpenWeatherMap.
+- The page highlights temperature, feels-like, humidity, wind, and cloud cover in a simple card layout.
+- For convenience the sample code ships with a placeholder API key defined directly in `routes/weather.js`. Replace it with your own key before deploying and consider moving it back into an environment variable.
+
+## API endpoints
+- `/api/books` returns every book in JSON format with no authentication, making it easy to consume the catalogue programmatically.
+- Optional query parameters: `search` (substring match on name), `minprice` / `maxprice` (numeric filters, supports snake_case variations), and `sort` (`name` or `price`, ascending). Parameters can be combined.
+- Example calls:
+   - `GET /api/books` → full catalogue.
+   - `GET /api/books?search=world` → titles containing "world".
+   - `GET /api/books?minprice=5&maxprice=10&sort=price` → £5-£10 books sorted by price.
+   - `GET /api/books?search=classic&sort=name` → alphabetical list of matching books.
+
 ## Audit
 
 The application records an audit trail of login attempts so that successful and failed logins can be reviewed later:
@@ -84,6 +98,10 @@ The application uses `express-session` to manage user sessions and restricts acc
 - `/books/search` — search form
 - `/books/search-result` — search results
 - `/weather` — interactive weather page (OpenWeatherMap)
+- `/api/books` — JSON list of all books
+- `/api/books?search=term` — filtered JSON list of books containing `term`
+- `/api/books?minprice=5&max_price=10` — books priced between £5 and £10 (supports `minprice/maxprice` or `min_price/max_price`)
+- `/api/books?sort=name` — sorted results (supports `name` or `price`)
 
 The `redirectLogin` middleware checks for `req.session.userId`; if absent, users are redirected to the login page. When a user successfully logs in via `/users/loggedin`, their username is stored in `req.session.userId` and they gain access to protected routes.
 

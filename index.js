@@ -75,6 +75,10 @@ app.use('/books', booksRoutes)
 const weatherRoutes = require('./routes/weather')
 app.use('/weather', weatherRoutes)
 
+// Load and register routes for API endpoints (routes/api.js)
+const apiRoutes = require('./routes/api')
+app.use('/api', apiRoutes)
+
 // ===== START SERVER =====
 // Start the web server and listen on the specified port
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
